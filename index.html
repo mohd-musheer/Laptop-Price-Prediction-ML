@@ -101,7 +101,6 @@ button{
 </div>
 
 <script>
-
 const API_URL = "https://laptop-price-prediction-vhid.onrender.com";
 
 async function predict(){
@@ -121,15 +120,17 @@ async function predict(){
   });
 
   const data = await res.json();
+
   document.getElementById("result").style.display = "block";
-  document.getElementById("result").innerText = "💰 Estimated Price: ₹ " + data["Estimated Price (INR)"];
+  document.getElementById("result").innerText = "💰 Estimated Price: ₹ " + data.prediction;
 }
 
-// Home check for GET '/'
+// Home page connection check
 fetch(API_URL + "/")
 .then(r => console.log("API Connected 🟢"))
 .catch(e => console.log("API Error ❌"));
 </script>
+
 
 </body>
 </html>
