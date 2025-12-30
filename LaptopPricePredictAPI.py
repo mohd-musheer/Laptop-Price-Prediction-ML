@@ -33,19 +33,17 @@ def home():
 # Prediction Route
 @app.post("/predict")
 def predict_price(data: DataClass):
-    model = joblib.load("LaptopPricePredict.pkl")
-
-    df = pd.DataFrame([{
-        "Brand": data.Brand,
-        "Processor": data.Processor,
-        "Operating_System": data.Operating_System,
-        "Storage": data.Storage,
-        "RAM": data.RAM,
-        "Touch_Screen": data.Touch_Screen
-    }])
-
     try:
+        model = joblib.load("LaptopPricePredict.pkl")
+
+        df = pd.DataFrame([data.dict()])
         prediction = model.predict(df)[0]
+
+        # 🔥 FIX HERE: Convert numpy.int64 → int
+        prediction = int(prediction)
+
         return {"prediction": prediction}
+
     except Exception as e:
+        print("🔥 ERROR:", e)
         return {"error": str(e)}
