@@ -39,5 +39,5 @@ def pred_price(d:DataClass):
     }
     df = pd.DataFrame([data])
     result= pipe.predict(df)[0]
-    return JSONResponse(status_code=200,content={'message':result})
+    return JSONResponse(status_code=200,content={'prediction':result})
 
