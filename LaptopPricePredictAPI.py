@@ -1,43 +1,50 @@
 from fastapi import FastAPI
-from pydantic import BaseModel ,Field
-from fastapi.responses import JSONResponse,HTMLResponse
+from pydantic import BaseModel
+from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 import joblib
 import pandas as pd
-from fastapi.staticfiles import StaticFiles
 
-app=FastAPI()
+app = FastAPI()
+
+# Allow frontend → backend communication
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class DataClass(BaseModel):
-    Brand:str=Field(...,example='HP',description='HP Apple Lenovo ASUS DELL Acer SAMSUNG MSI Infinix Ultimus CHUWI WINGS ZEBRONICS Primebook GIGABYTE realme MICROSOFT LG')
-    Processor:str=Field(...,example='Core i3',description='Core i3, M1, Core i7, Core i5, Ryzen 5 Hexa Core,Celeron Dual Core, Ryzen 7 Octa Core, Ryzen 5 Quad Core,Ryzen 3 Dual Core, Ryzen 3 Quad Core, M2, Celeron Quad Core,Athlon Dual Core, MediaTek Kompanio 1200, Ryzen 9 Octa Core,MediaTek MT8788, Ryzen Z1 HexaCore, MediaTek Kompanio 500, Core i9,MediaTek Kompanio 520, Ryzen Z1 Octa Core, Pentium Silver, Ryzen 5,M1 Max, M2 Max, M3 Pro, M1 Pro, Ryzen 7 Quad Core,Ryzen 5 Dual Core, Ryzen 9 16 Core')
-    Operating_System:str=Field(...,example='Windows 11 Home',description='Windows 11 Home, Mac OS Big Sur, DOS, Mac OS Monterey, Chrome,Windows 10, Windows 10 Home, Prime OS, Windows 11 Pro, Ubuntu,Windows 10 Pro, macOS Ventura, macOS Sonoma, Mac OS Mojave')
-    Storage:int=Field(...,example=512,description=' in GB')
-    RAM:int=Field(...,example=8,description=' in GB')
-    Touch_Screen:int=Field(...,example=0,description=' in 0 1 for yes or no')
+    Brand: str
+    Processor: str
+    Operating_System: str
+    Storage: int
+    RAM: int
+    Touch_Screen: int
 
-
-
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
+# Home Route
 @app.get("/", response_class=HTMLResponse)
-def serve_home():
-    with open("index.html", "r") as file:
-        return file.read()
+def root():
+    return "<h2>Laptop Price Predictor API is Live 🚀</h2>"
 
+# Prediction Route
+@app.post("/predict")
+def predict_price(data: DataClass):
+    model = joblib.load("LaptopPricePredict.pkl")
 
-@app.post('/predict')
-def pred_price(d:DataClass):
-    pipe=joblib.load('LaptopPricePredict.pkl')
+    df = pd.DataFrame([{
+        "Brand": data.Brand,
+        "Processor": data.Processor,
+        "Operating_System": data.Operating_System,
+        "Storage": data.Storage,
+        "RAM": data.RAM,
+        "Touch_Screen": data.Touch_Screen
+    }])
 
-    data = {
-    'Brand': d.Brand,
-    'Processor': d.Processor,
-    'Operating_System':d.Operating_System,
-    'Storage': d.Storage,
-    'RAM': d.RAM,
-    'Touch_Screen': d.Touch_Screen
-    }
-    df = pd.DataFrame([data])
-    result= pipe.predict(df)[0]
-    return JSONResponse(status_code=200,content={'prediction':result})
-
+    try:
+        prediction = model.predict(df)[0]
+        return {"prediction": prediction}
+    except Exception as e:
+        return {"error": str(e)}

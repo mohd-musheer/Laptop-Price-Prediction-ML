@@ -7,51 +7,49 @@
 
 <style>
 body{
-    background:#0b162c;
+    background:#081122;
     font-family:Arial, sans-serif;
     display:flex;
     justify-content:center;
     align-items:center;
-    height:100vh;
-    color:white;
-    margin:0;
+    min-height:100vh;
+    color:white; margin:0;
 }
 .container{
     width:400px;
     background:#111a3b;
-    padding:20px;
+    padding:25px;
     border-radius:12px;
     box-shadow:0 0 20px rgba(0,255,200,.35);
 }
-h2{
-    text-align:center;
-    margin-bottom:15px;
-}
+h2{ text-align:center; }
 select, input{
-    width:100%;
-    padding:10px;
-    margin:8px 0;
-    border-radius:8px;
-    border:none;
+    width:100%; padding:10px; margin:8px 0;
+    border-radius:8px; border:none;
 }
 button{
-    width:100%;
-    padding:12px;
-    background:#00ffe7;
-    color:black;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    font-weight:bold;
+    width:100%; padding:12px;
+    background:#00ffe7; color:black;
+    border:none; border-radius:8px;
+    cursor:pointer; font-weight:bold;
 }
 #result{
-    margin-top:15px;
-    padding:12px;
-    background:#00ffd564;
-    border-radius:10px;
+    margin-top:15px; padding:12px;
+    background:#00ffd564; border-radius:10px;
+    display:none; text-align:center; font-size:18px;
+}
+.loader{
     display:none;
-    text-align:center;
-    font-size:18px;
+    border:6px solid #f3f3f3;
+    border-top:6px solid #00ffe7;
+    border-radius:50%;
+    width:40px; height:40px;
+    animation: spin 1s linear infinite;
+    margin:10px auto;
+}
+@keyframes spin{
+    0%{ transform:rotate(0deg);}
+    100%{ transform:rotate(360deg);}
 }
 </style>
 </head>
@@ -62,75 +60,74 @@ button{
 
 <label>Brand</label>
 <select id="brand">
-<option>HP</option><option>Apple</option><option>Lenovo</option><option>ASUS</option><option>Dell</option>
-<option>Acer</option><option>Samsung</option><option>MSI</option><option>Infinix</option><option>GIGABYTE</option>
-<option>realme</option><option>LG</option><option>MICROSOFT</option><option>ZEBRONICS</option>
+<option>HP</option><option>Apple</option><option>Lenovo</option>
+<option>ASUS</option><option>Dell</option><option>Acer</option>
+<option>Samsung</option><option>MSI</option><option>LG</option>
 </select>
 
 <label>Processor</label>
 <select id="processor">
-<option>Core i3</option><option>Core i5</option><option>Core i7</option><option>Core i9</option>
-<option>Ryzen 3 Dual Core</option><option>Ryzen 5 Quad Core</option><option>Ryzen 7 Octa Core</option><option>Ryzen 9 16 Core</option>
-<option>Celeron Dual Core</option><option>Pentium Silver</option><option>M1</option><option>M2</option><option>M3 Pro</option>
-<option>M1 Max</option><option>M2 Max</option>
+<option>Core i3</option><option>Core i5</option><option>Core i7</option>
+<option>Ryzen 5 Quad Core</option><option>Ryzen 7 Octa Core</option>
 </select>
 
 <label>Operating System</label>
 <select id="os">
-<option>Windows 11 Home</option><option>Windows 10</option><option>Windows 10 Home</option><option>Windows 10 Pro</option>
-<option>Windows 11 Pro</option><option>Ubuntu</option><option>Mac OS Big Sur</option><option>macOS Sonoma</option>
-<option>Chrome</option><option>Prime OS</option>
+<option>Windows 11 Home</option><option>Windows 10</option>
+<option>Mac OS Big Sur</option><option>Ubuntu</option>
 </select>
 
 <label>Storage (GB)</label>
-<input type="number" id="storage" placeholder="e.g. 512">
+<input type="number" id="storage" placeholder="512">
 
 <label>RAM (GB)</label>
-<input type="number" id="ram" placeholder="e.g. 8">
+<input type="number" id="ram" placeholder="8">
 
 <label>Touch Screen</label>
 <select id="touch">
-<option value="0">No</option>
-<option value="1">Yes</option>
+<option value="0">No</option><option value="1">Yes</option>
 </select>
 
+<div class="loader" id="loader"></div>
 <button onclick="predict()">Predict 💸</button>
 
 <div id="result"></div>
-
 </div>
 
 <script>
-const API_URL = "https://laptop-price-prediction-vhid.onrender.com";
+const API = "https://laptop-price-prediction-vhid.onrender.com";
 
 async function predict(){
-  const payload = {
-    "Brand": document.getElementById("brand").value,
-    "Processor": document.getElementById("processor").value,
-    "Operating_System": document.getElementById("os").value,
-    "Storage": Number(document.getElementById("storage").value),
-    "RAM": Number(document.getElementById("ram").value),
-    "Touch_Screen": Number(document.getElementById("touch").value)
-  };
+    document.getElementById("loader").style.display = "block";
+    document.getElementById("result").style.display = "none";
 
-  let res = await fetch(`${API_URL}/predict`, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(payload)
-  });
+    const payload = {
+        Brand: brand.value,
+        Processor: processor.value,
+        Operating_System: os.value,
+        Storage: Number(storage.value),
+        RAM: Number(ram.value),
+        Touch_Screen: Number(touch.value)
+    };
 
-  const data = await res.json();
+    let response = await fetch(`${API}/predict`,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(payload)
+    });
 
-  document.getElementById("result").style.display = "block";
-  document.getElementById("result").innerText = "💰 Estimated Price: ₹ " + data.prediction;
+    document.getElementById("loader").style.display = "none";
+    const json = await response.json();
+
+    if(json.prediction){
+        document.getElementById("result").style.display = "block";
+        document.getElementById("result").innerText = "💰 Estimated Price: ₹ "+json.prediction;
+    } else {
+        document.getElementById("result").style.display = "block";
+        document.getElementById("result").innerText = "❌ Error: "+json.error;
+    }
 }
-
-// Home page connection check
-fetch(API_URL + "/")
-.then(r => console.log("API Connected 🟢"))
-.catch(e => console.log("API Error ❌"));
 </script>
-
 
 </body>
 </html>
