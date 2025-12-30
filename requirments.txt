@@ -5,3 +5,4 @@ fastapi.responses
 joblib
 pydantic
 uvicorn
+fastapi.staticfiles

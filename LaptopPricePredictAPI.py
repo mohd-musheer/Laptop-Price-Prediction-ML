@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from pydantic import BaseModel ,Field
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse,HTMLResponse
 import joblib
 import pandas as pd
+from fastapi.staticfiles import StaticFiles
 
 app=FastAPI()
 
@@ -14,9 +15,14 @@ class DataClass(BaseModel):
     RAM:int=Field(...,example=8,description=' in GB')
     Touch_Screen:int=Field(...,example=0,description=' in 0 1 for yes or no')
 
-@app.get("/")
-def home():
-    return {"message": "Laptop Price Predictor API is Live 🚀"}
+
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/", response_class=HTMLResponse)
+def serve_home():
+    with open("index.html", "r") as file:
+        return file.read()
 
 
 @app.post('/predict')
