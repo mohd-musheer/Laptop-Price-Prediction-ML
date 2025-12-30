@@ -15,7 +15,7 @@ class DataClass(BaseModel):
     Touch_Screen:int=Field(...,example=0,description=' in 0 1 for yes or no')
 
 
-@app.post('/')
+@app.post('/predict')
 def pred_price(d:DataClass):
     pipe=joblib.load('LaptopPricePredict.pkl')
 

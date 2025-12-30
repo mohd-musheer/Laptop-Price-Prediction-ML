@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laptop Price Predictor</title>
+
+<style>
+body{
+    background:#0b162c;
+    font-family:Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    color:white;
+    margin:0;
+}
+.container{
+    width:400px;
+    background:#111a3b;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(0,255,200,.35);
+}
+h2{
+    text-align:center;
+    margin-bottom:15px;
+}
+select, input{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border-radius:8px;
+    border:none;
+}
+button{
+    width:100%;
+    padding:12px;
+    background:#00ffe7;
+    color:black;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+#result{
+    margin-top:15px;
+    padding:12px;
+    background:#00ffd564;
+    border-radius:10px;
+    display:none;
+    text-align:center;
+    font-size:18px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h2>💻 Laptop Price Predictor</h2>
+
+<label>Brand</label>
+<select id="brand">
+<option>HP</option><option>Apple</option><option>Lenovo</option><option>ASUS</option><option>Dell</option>
+<option>Acer</option><option>Samsung</option><option>MSI</option><option>Infinix</option><option>GIGABYTE</option>
+<option>realme</option><option>LG</option><option>MICROSOFT</option><option>ZEBRONICS</option>
+</select>
+
+<label>Processor</label>
+<select id="processor">
+<option>Core i3</option><option>Core i5</option><option>Core i7</option><option>Core i9</option>
+<option>Ryzen 3 Dual Core</option><option>Ryzen 5 Quad Core</option><option>Ryzen 7 Octa Core</option><option>Ryzen 9 16 Core</option>
+<option>Celeron Dual Core</option><option>Pentium Silver</option><option>M1</option><option>M2</option><option>M3 Pro</option>
+<option>M1 Max</option><option>M2 Max</option>
+</select>
+
+<label>Operating System</label>
+<select id="os">
+<option>Windows 11 Home</option><option>Windows 10</option><option>Windows 10 Home</option><option>Windows 10 Pro</option>
+<option>Windows 11 Pro</option><option>Ubuntu</option><option>Mac OS Big Sur</option><option>macOS Sonoma</option>
+<option>Chrome</option><option>Prime OS</option>
+</select>
+
+<label>Storage (GB)</label>
+<input type="number" id="storage" placeholder="e.g. 512">
+
+<label>RAM (GB)</label>
+<input type="number" id="ram" placeholder="e.g. 8">
+
+<label>Touch Screen (0 = No, 1 = Yes)</label>
+<select id="touch">
+<option value="0">No</option>
+<option value="1">Yes</option>
+</select>
+
+<button onclick="predict()">Predict 💸</button>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+const API_URL = "https://laptop-price-prediction-vhid.onrender.com/predict";
+
+async function predict(){
+  const payload = {
+    "Brand": document.getElementById("brand").value,
+    "Processor": document.getElementById("processor").value,
+    "Operating_System": document.getElementById("os").value,
+    "Storage": Number(document.getElementById("storage").value),
+    "RAM": Number(document.getElementById("ram").value),
+    "Touch_Screen": Number(document.getElementById("touch").value)
+  };
+
+  let res = await fetch(`${API_URL}/predict`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json();
+  document.getElementById("result").style.display = "block";
+  document.getElementById("result").innerText = "💰 Estimated Price: ₹ " + data["Estimated Price (INR)"];
+}
+
+// Home check for GET '/'
+fetch(API_URL + "/")
+.then(r => console.log("API Connected 🟢"))
+.catch(e => console.log("API Error ❌"));
+</script>
+
+</body>
+</html>
