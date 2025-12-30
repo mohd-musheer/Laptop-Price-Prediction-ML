@@ -14,6 +14,10 @@ class DataClass(BaseModel):
     RAM:int=Field(...,example=8,description=' in GB')
     Touch_Screen:int=Field(...,example=0,description=' in 0 1 for yes or no')
 
+@app.get("/")
+def home():
+    return {"message": "Laptop Price Predictor API is Live 🚀"}
+
 
 @app.post('/predict')
 def pred_price(d:DataClass):
