@@ -7,7 +7,7 @@ import pandas as pd
 
 app = FastAPI()
 
-# Allow frontend → backend communication
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

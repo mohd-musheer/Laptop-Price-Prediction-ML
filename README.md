@@ -3,6 +3,12 @@
 This project predicts the price of a laptop based on its specifications using Machine Learning.
 The model is trained using Random Forest Regressor + PCA, achieving ~80% R² Accuracy.
 
+Running with UI : https://laptop-price-prediction-vhid.onrender.com
+
+
+
+api : https://laptop-price-prediction-vhid.onrender.com/predict
+
 🧠 Summary
 
 Input features: Brand, Processor, Operating System, Storage, RAM, Touch Screen
