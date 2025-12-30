@@ -26,8 +26,9 @@ class DataClass(BaseModel):
 
 # Home Route
 @app.get("/", response_class=HTMLResponse)
-def root():
-    return "<h2>Laptop Price Predictor API is Live 🚀</h2>"
+def home():
+    with open("index.html", "r") as f:
+        return f.read()
 
 # Prediction Route
 @app.post("/predict")
